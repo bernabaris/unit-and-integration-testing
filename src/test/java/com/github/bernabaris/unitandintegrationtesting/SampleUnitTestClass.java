@@ -1,16 +1,35 @@
 package com.github.bernabaris.unitandintegrationtesting;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class SampleUnitTestClass {
 
-    Calculator calculatorTest = new Calculator();
+    Calculator calculatorTest;
+
+    @BeforeEach
+    void setUp() {
+        System.out.println("inside before each");
+        this.calculatorTest = new Calculator();
+    }
+
+    @AfterEach
+    void afterEach() {
+        System.out.println("inside after each");
+    }
+
+    @BeforeAll
+    static void beforeAll() {
+        System.out.println("inside before all");
+    }
+
+    @AfterAll
+    static void afterAll() {
+        System.out.println("inside after all");
+    }
 
     @Test
     @DisplayName(value = "This test should return equals when add two number")
@@ -59,6 +78,18 @@ public class SampleUnitTestClass {
         int result = calculatorTest.multiply(firstNumber, secondNumber);
 
         Assertions.assertTrue(result > 0);
+    }
+
+    @Test
+    public void should_throwException_whenDivideByZero(){
+        int firstNumber = 10;
+        int secondNumber = 0;
+
+        Executable executable = () -> calculatorTest.divide(firstNumber, secondNumber);
+
+
+        Assertions.assertThrows(ArithmeticException.class, executable);
+
     }
 
     @Test
