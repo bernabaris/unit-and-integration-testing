@@ -4,6 +4,7 @@ import com.github.bernabaris.unitandintegrationtesting.dto.OrderDto;
 import com.github.bernabaris.unitandintegrationtesting.model.Order;
 import com.github.bernabaris.unitandintegrationtesting.service.OrderService;
 import com.github.bernabaris.unitandintegrationtesting.util.Converter;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,9 @@ public class OrderController {
     @PostMapping("/orders")
     public ResponseEntity<OrderDto> saveOrder(@RequestBody OrderDto orderDto){
         Order savedOrder = orderService.saveOrder(Converter.orderDtoToModel(orderDto));
+        if(savedOrder == null){
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(Converter.orderModelToDto(savedOrder));
     }
 
@@ -43,11 +47,13 @@ public class OrderController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<OrderDto> deleteOrderById(@PathVariable Long id){
-        Order order = orderService.deleteOrderById(id);
-        return ResponseEntity.ok(Converter.orderModelToDto(order));
+    public ResponseEntity<Void> deleteOrderById(@PathVariable Long id){
+        try {
+            orderService.deleteOrderById(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
-
-
 }
 
